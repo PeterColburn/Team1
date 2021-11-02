@@ -1,0 +1,512 @@
+from tkinter import *
+import tkinter.messagebox as tkMessageBox
+import sqlite3
+import tkinter.ttk as ttk
+import time
+import datetime
+from tkinter import messagebox
+
+#OPENING TITLE
+root = Tk()
+root.title("Payroll system0")
+width = 1024
+height = 720
+screen_width = root.winfo_screenwidth()
+screen_height = root.winfo_screenheight()
+x = (screen_width/2) - (width/2)
+y = (screen_height/2) - (height/2)
+root.geometry("%dx%d+%d+%d" % (width, height, x, y))
+root.resizable(0, 0)
+root.config(bg = "#81F7F3")
+
+#VARIABLES
+USERNAME = StringVar()
+PASSWORD = StringVar()
+NAME = StringVar()
+ADDR = StringVar()
+NI = StringVar()
+SEARCH = StringVar()
+Name = StringVar()
+Address = StringVar()
+HoursWorked = StringVar()
+WagesHour = StringVar()
+Payable = StringVar()
+Taxable = StringVar()
+NetPayable = StringVar()
+GrossPayable = StringVar()
+OvertimeHours = StringVar()
+Employer = StringVar()
+NINumber = StringVar()
+TimeOfOrder = StringVar()
+DateOfOrder = StringVar()
+DateOfOrder.set(time.strftime("%d/%m/%Y"))
+
+def ShowLoginForm():
+    global loginform
+    loginform = Toplevel()
+    loginform.title("Payroll Login1")
+    width = 1024
+    height = 760
+    #panel
+    Label(root, text="Position 1 : x=0, y=0", bg="#01A9DB", fg="#01A9DB", height=50).place(x=0, y=0)
+    screen_width = root.winfo_screenwidth()
+    screen_height = root.winfo_screenheight()
+    x = (screen_width/2) - (width/2)
+    y = (screen_height/2) - (height/2)
+    loginform.resizable(0, 0)
+    loginform.geometry("%dx%d+%d+%d" % (width, height, x, y))
+    LoginForm()
+
+def AdminShowLoginForm():
+    global aloginform
+    aloginform = Toplevel()
+    aloginform.title("Payroll Login1")
+    width = 1024
+    height = 760
+    #panel
+    Label(root, text="Position 1 : x=0, y=0", bg="#01A9DB", fg="#01A9DB", height=50).place(x=0, y=0)
+    screen_width = root.winfo_screenwidth()
+    screen_height = root.winfo_screenheight()
+    x = (screen_width/2) - (width/2)
+    y = (screen_height/2) - (height/2)
+    aloginform.resizable(0, 0)
+    aloginform.geometry("%dx%d+%d+%d" % (width, height, x, y))
+    AdminLoginForm()
+
+def LoginForm():
+    global lbl_result
+    loginform.configure( bg = "#81F7F3")
+    TopLoginForm = Frame(loginform, width=600, height=100, bd=1, relief=SOLID, bg = "#81F7F3")
+    TopLoginForm.pack(side=TOP, pady=20)
+    #login title
+    lbl_text = Label(TopLoginForm, text="Login", font=('arial', 45), bg = "white")
+    lbl_text.pack(fill=X)
+
+
+    #panel
+    Label(root, text="Position 1 : x=0, y=0", bg="#01A9DB", fg="#01A9DB", height=50).place(x=0, y=0)
+
+
+    #logo not working
+    #my_logo_pic = PhotoImage(file = "brainwirelogo.png")
+    #lab = Label(TopLoginForm, image = my_logo_pic, bg="#81F7F3", relief = "groove")
+    #lab.pack(fill=Y)
+
+    MidLoginForm = Frame(loginform, width=600, bg = "#81F7F3")
+    MidLoginForm.pack(side=TOP, pady=50)
+    #username label
+    lbl_username = Label(MidLoginForm, text="Username:", font=('arial', 25), bd=18, bg = "#81F7F3", relief = "groove")
+    lbl_username.grid(row=0)
+    #password label
+    lbl_password = Label(MidLoginForm, text="Password:", font=('arial', 25), bd=18, bg = "#81F7F3", relief = "groove")
+    lbl_password.grid(row=1)
+    #error label
+    lbl_result = Label(MidLoginForm, text="", font=('arial', 18), bg = "#81F7F3", relief = "groove")
+    lbl_result.grid(row=3, columnspan=2)
+    #username text input
+    username = Entry(MidLoginForm, textvariable=USERNAME, font=('arial', 25), width=15)
+    username.grid(row=0, column=1)
+    #password text input
+    password = Entry(MidLoginForm, textvariable=PASSWORD, font=('arial', 25), width=15, show="*")
+    password.grid(row=1, column=1)
+    #login button
+    btn_login = Button(MidLoginForm, text="Login", font=('arial', 18), width=30, bg="#01A9DB", command=Login)
+    btn_login.grid(row=2, columnspan=2, pady=20)
+
+    btn_login.bind('<Return>', Login)
+
+def AdminLoginForm():
+    global lbl_result
+    aloginform.configure( bg = "#81F7F3")
+    TopLoginForm = Frame(aloginform, width=600, height=100, bd=1, relief=SOLID, bg = "#81F7F3")
+    TopLoginForm.pack(side=TOP, pady=20)
+    #login title
+    lbl_text = Label(TopLoginForm, text="Login", font=('arial', 45), bg = "white")
+    lbl_text.pack(fill=X)
+
+    MidLoginForm = Frame(aloginform, width=600, bg = "#81F7F3")
+    MidLoginForm.pack(side=TOP, pady=50)
+    #username label
+    lbl_username = Label(MidLoginForm, text="Username:", font=('arial', 25), bd=18, bg = "#81F7F3", relief = "groove")
+    lbl_username.grid(row=0)
+    #password label
+    lbl_password = Label(MidLoginForm, text="Password:", font=('arial', 25), bd=18, bg = "#81F7F3", relief = "groove")
+    lbl_password.grid(row=1)
+    #error label
+    lbl_result = Label(MidLoginForm, text="", font=('arial', 18), bg = "#81F7F3", relief = "groove")
+    lbl_result.grid(row=3, columnspan=2)
+    #username text input
+    username = Entry(MidLoginForm, textvariable=USERNAME, font=('arial', 25), width=15)
+    username.grid(row=0, column=1)
+    #password text input
+    password = Entry(MidLoginForm, textvariable=PASSWORD, font=('arial', 25), width=15, show="*")
+    password.grid(row=1, column=1)
+    #login button
+    btn_login = Button(MidLoginForm, text="Login", font=('arial', 18), width=30, bg="#01A9DB", command=AdminLogin)
+    btn_login.grid(row=2, columnspan=2, pady=20)
+
+    btn_login.bind('<Return>', AdminLogin)
+
+def Database():
+    global conn, cursor
+    conn = sqlite3.connect("pythontut.db")
+    cursor = conn.cursor()
+    cursor.execute("CREATE TABLE IF NOT EXISTS `associate` (admin_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, username TEXT, password TEXT)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS `product` (product_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, product_name TEXT, product_qty TEXT, product_price TEXT)")
+    cursor.execute("SELECT * FROM `associate` WHERE `username` = 'associate' AND `password` = 'associate'")
+    if cursor.fetchone() is None:
+        cursor.execute("INSERT INTO `associate` (username, password) VALUES('associate', 'associate')")
+        conn.commit()
+
+def AdminDatabase():
+    global conn, cursor
+    conn = sqlite3.connect("pythontut.db")
+    cursor = conn.cursor()
+    cursor.execute("CREATE TABLE IF NOT EXISTS `admin` (admin_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, username TEXT, password TEXT)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS `product` (product_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, product_name TEXT, product_qty TEXT, product_price TEXT)")
+    cursor.execute("SELECT * FROM `admin` WHERE `username` = 'admin' AND `password` = 'admin'")
+    if cursor.fetchone() is None:
+        cursor.execute("INSERT INTO `admin` (username, password) VALUES('admin', 'admin')")
+        conn.commit()
+
+def Login(event=None):
+    global admin_id
+    Database()
+    if USERNAME.get == "" or PASSWORD.get() == "":
+        lbl_result.config(text="Please complete the required field!", fg="red")
+    else:
+        cursor.execute("SELECT * FROM `associate` WHERE `username` = ? AND `password` = ?", (USERNAME.get(), PASSWORD.get()))
+        if cursor.fetchone() is not None:
+            cursor.execute("SELECT * FROM `associate` WHERE `username` = ? AND `password` = ?", (USERNAME.get(), PASSWORD.get()))
+            data = cursor.fetchone()
+            admin_id = data[0]
+            USERNAME.set("")
+            PASSWORD.set("")
+            lbl_result.config(text="")
+            ShowHome()
+        else:
+            lbl_result.config(text="Invalid username or password", fg="red")
+            USERNAME.set("")
+            PASSWORD.set("")
+    cursor.close()
+    conn.close() 
+
+def AdminLogin(event=None):
+    global admin_id
+    Database()
+    if USERNAME.get == "" or PASSWORD.get() == "":
+        lbl_result.config(text="Please complete the required field!", fg="red")
+    else:
+        cursor.execute("SELECT * FROM `admin` WHERE `username` = ? AND `password` = ?", (USERNAME.get(), PASSWORD.get()))
+        if cursor.fetchone() is not None:
+            cursor.execute("SELECT * FROM `admin` WHERE `username` = ? AND `password` = ?", (USERNAME.get(), PASSWORD.get()))
+            data = cursor.fetchone()
+            admin_id = data[0]
+            USERNAME.set("")
+            PASSWORD.set("")
+            lbl_result.config(text="")
+            AdminShowHome()
+        else:
+            lbl_result.config(text="Invalid username or password", fg="red")
+            USERNAME.set("")
+            PASSWORD.set("")
+    cursor.close()
+    conn.close() 
+
+def ShowHome():
+    root.withdraw()
+    Home()
+
+def AdminShowHome():
+    root.withdraw()
+    AdminHome()
+
+def Home():
+    global Home
+    Home = Toplevel()
+    Home.title("Payroll System/Home2")
+    width = 1024
+    height = 720
+    screen_width = Home.winfo_screenwidth()
+    screen_height = Home.winfo_screenheight()
+    x = (screen_width/2) - (width/2)
+    y = (screen_height/2) - (height/2)
+    Home.geometry("%dx%d+%d+%d" % (width, height, x, y))
+    Home.resizable(0, 0)
+    Title = Frame(Home, bd=1, relief=SOLID)
+    Title.pack(pady=10)
+    lbl_display = Label(Title, text="Payroll System8", font=('arial', 45), bg = "white")
+    lbl_display.pack()
+#panel
+
+    Label(Home, text="Position 1 : x=0, y=0", bg="#01A9DB", fg="#01A9DB", height=50).place(x=0, y=0)
+   
+
+#logo
+    #my_logo_pic = PhotoImage(file = "brainwirelogo.png")
+    #lab = Label(Home, image = my_logo_pic, bg = "orange")
+    #lab.pack()
+    
+    menubar = Menu(Home)
+    filemenu = Menu(menubar, tearoff=0)
+    filemenu2 = Menu(menubar, tearoff=0)
+    filemenu.add_command(label="Logout", command=Logout)
+    filemenu.add_command(label="Exit", command=Exit2)
+    filemenu2.add_command(label="View", command=ShowView)
+    menubar.add_cascade(label="Login6", menu=filemenu)
+    menubar.add_cascade(label="Employees", menu=filemenu2)
+    Home.config(menu=menubar)
+    Home.config(bg="#81F7F3")
+
+def AdminHome():
+    global Home
+    Home = Toplevel()
+    Home.title("Payroll System/Home2")
+    width = 1024
+    height = 760
+    screen_width = Home.winfo_screenwidth()
+    screen_height = Home.winfo_screenheight()
+    x = (screen_width/2) - (width/2)
+    y = (screen_height/2) - (height/2)
+    Home.geometry("%dx%d+%d+%d" % (width, height, x, y))
+    Home.resizable(0, 0)
+    Title = Frame(Home, bd=1, relief=SOLID)
+    Title.pack(pady=10)
+    lbl_display = Label(Title, text="Payroll System8", font=('arial', 45), bg = "white")
+    lbl_display.pack()
+#panel
+
+    Label(Home, text="Position 1 : x=0, y=0", bg="#01A9DB", fg="#01A9DB", height=50).place(x=0, y=0)
+   
+
+#logo
+    #my_logo_pic = PhotoImage(file = "brainwirelogo.png")
+    #lab = Label(Home, image = my_logo_pic, bg = "orange")
+    #lab.pack()
+    
+    menubar = Menu(Home)
+    filemenu = Menu(menubar, tearoff=0)
+    filemenu2 = Menu(menubar, tearoff=0)
+    filemenu.add_command(label="Logout", command=Logout)
+    filemenu.add_command(label="Exit", command=Exit2)
+    filemenu2.add_command(label="Add new", command=ShowAddNew)
+    filemenu2.add_command(label="View", command=ShowView)
+    menubar.add_cascade(label="Login6", menu=filemenu)
+    menubar.add_cascade(label="Employees", menu=filemenu2)
+    Home.config(menu=menubar)
+    Home.config(bg="#81F7F3")
+
+def ShowAddNew():
+    global addnewform
+    addnewform = Toplevel()
+    addnewform.title("Payroll System/Add new4")
+    width = 600
+    height = 400
+    screen_width = Home.winfo_screenwidth()
+    screen_height = Home.winfo_screenheight()
+    x = (screen_width/2) - (width/2)
+    y = (screen_height/2) - (height/2)
+    addnewform.geometry("%dx%d+%d+%d" % (width, height, x, y))
+    addnewform.resizable(0, 0)
+    AddNewForm()
+
+def AddNewForm():#========================================================================================================= sort colour out
+    TopAddNew = Frame(addnewform, width=600, height=100, bd=1, relief=SOLID, bg = "#81F7F3")
+    TopAddNew.pack(side=TOP, pady=10)
+    lbl_text = Label(TopAddNew, text="Add New Employee", font=('arial', 18), bg = "white")
+    lbl_text.pack()
+    MidAddNew = Frame(addnewform, width=600, bg = "#81F7F3")
+    MidAddNew.pack(side=TOP, pady=50)
+    lbl_name = Label(MidAddNew, text="Name:", font=('arial', 25), bd=10, bg = "#81F7F3")
+    lbl_name.grid(row=0, sticky=W)
+    lbl_addr = Label(MidAddNew, text="Address:", font=('arial', 25), bd=10, bg = "#81F7F3")
+    lbl_addr.grid(row=1, sticky=W)
+    lbl_NI = Label(MidAddNew, text="NI Number:", font=('arial', 25), bd=10, bg = "#81F7F3")
+    lbl_NI.grid(row=2, sticky=W)
+
+    productname = Entry(MidAddNew, textvariable=NAME, font=('arial', 25), width=15)
+    productname.grid(row=0, column=1)
+    productqty = Entry(MidAddNew, textvariable=NI, font=('arial', 25), width=15)
+    productqty.grid(row=1, column=1)
+    productprice = Entry(MidAddNew, textvariable=ADDR, font=('arial', 25), width=15)
+    productprice.grid(row=2, column=1)
+    btn_add = Button(MidAddNew, text="Save", font=('arial', 18), width=30, bg="#01A9DB", command=AddNew)
+    btn_add.grid(row=3, columnspan=2, pady=10)
+
+def AddNew():
+    Database()
+    cursor.execute("INSERT INTO `product` (product_name, product_qty, product_price) VALUES(?, ?, ?)", (str(NAME.get()), str(NI.get()), str(ADDR.get())))
+    conn.commit()
+    NAME.set("")
+    ADDR.set("")
+    NI.set("")
+    cursor.close()
+    conn.close()
+
+def ViewForm():
+    global tree    
+    TopViewForm = Frame(viewform, width=600, bd=1, relief="flat", bg = "#81F7F3")
+    TopViewForm.pack(side=TOP, fill=X)
+    LeftViewForm = Frame(viewform, width=600, bg = "#81F7F3")
+    LeftViewForm.pack(side=LEFT, fill=Y)
+    MidViewForm = Frame(viewform, width=600, bg = "#81F7F3")
+    MidViewForm.pack(side=RIGHT)
+    lbl_text = Label(TopViewForm, text="View Employees", font=('arial', 18), bg = "white", relief = SOLID)
+    lbl_text.pack()
+    lbl_txtsearch = Label(LeftViewForm, text="Search", font=('arial', 15), bg = "#81F7F3")
+    lbl_txtsearch.pack(side=TOP, anchor=W)
+    search = Entry(LeftViewForm, textvariable=SEARCH, font=('arial', 15), width=10)
+    search.pack(side=TOP,  padx=10, fill=X)
+    btn_search = Button(LeftViewForm, text="Search", command=Search, bg = "#01A9DB")
+    btn_search.pack(side=TOP, padx=10, pady=10, fill=X)
+    btn_reset = Button(LeftViewForm, text="Reset", command=Reset, bg = "#01A9DB")
+    btn_reset.pack(side=TOP, padx=10, pady=10, fill=X)
+    btn_delete = Button(LeftViewForm, text="Delete", command=Delete, bg = "#01A9DB")
+    btn_delete.pack(side=TOP, padx=10, pady=10, fill=X)
+    scrollbarx = Scrollbar(MidViewForm, orient=HORIZONTAL)
+    scrollbary = Scrollbar(MidViewForm, orient=VERTICAL)
+    tree = ttk.Treeview(MidViewForm, columns=("ProductID", "Employee Name", "Address", "NI"), selectmode="extended", height=100, yscrollcommand=scrollbary.set, xscrollcommand=scrollbarx.set)
+    scrollbary.config(command=tree.yview)
+    scrollbary.pack(side=RIGHT, fill=Y)
+    scrollbarx.config(command=tree.xview)
+    scrollbarx.pack(side=BOTTOM, fill=X)
+    tree.heading('ProductID', text="ProductID",anchor=W)
+    tree.heading('Employee Name', text="Employee Name",anchor=W)
+    tree.heading('Address', text="Address",anchor=W)
+    tree.heading('NI', text="NI",anchor=W)
+    tree.column('#0', stretch=NO, minwidth=0, width=0)
+    tree.column('#1', stretch=NO, minwidth=0, width=0)
+    tree.column('#2', stretch=NO, minwidth=0, width=200)
+    tree.column('#3', stretch=NO, minwidth=0, width=120)
+    tree.column('#4', stretch=NO, minwidth=0, width=120)
+    tree.pack()
+    DisplayData()
+
+def DisplayData():
+    Database()
+    cursor.execute("SELECT * FROM `product`")
+    fetch = cursor.fetchall()
+    for data in fetch:
+        tree.insert('', 'end', values=(data))
+    cursor.close()
+    conn.close()
+
+def Search():
+    if SEARCH.get() != "":
+        tree.delete(*tree.get_children())
+        Database()
+        cursor.execute("SELECT * FROM `product` WHERE `product_name` LIKE ?", ('%'+str(SEARCH.get())+'%',))
+        fetch = cursor.fetchall()
+        for data in fetch:
+            tree.insert('', 'end', values=(data))
+        cursor.close()
+        conn.close()
+
+def Reset():
+    tree.delete(*tree.get_children())
+    DisplayData()
+    SEARCH.set("")
+
+def Delete():
+    if not tree.selection():
+       print("ERROR")
+    else:
+        result = tkMessageBox.askquestion('Payroll System', 'Are you sure you want to delete this record?', icon="warning")
+        if result == 'yes':
+            curItem = tree.focus()
+            contents =(tree.item(curItem))
+            selecteditem = contents['values']
+            tree.delete(curItem)
+            Database()
+            cursor.execute("DELETE FROM `product` WHERE `product_id` = %d" % selecteditem[0])
+            conn.commit()
+            cursor.close()
+            conn.close()
+
+def ShowView():
+    global viewform
+    viewform = Toplevel()
+    viewform.title("View Employees")
+    width = 600
+    height = 400
+    screen_width = Home.winfo_screenwidth()
+    screen_height = Home.winfo_screenheight()
+    x = (screen_width/2) - (width/2)
+    y = (screen_height/2) - (height/2)
+    viewform.geometry("%dx%d+%d+%d" % (width, height, x, y))
+    viewform.resizable(0, 0)
+    ViewForm()
+
+def Logout():
+    result = tkMessageBox.askquestion('Payroll System', 'Are you sure you want to logout?', icon="warning")
+    if result == 'yes': 
+        admin_id = ""
+        root.deiconify()
+        Home.destroy() 
+
+def Exit():
+    result = tkMessageBox.askquestion('Payroll System', 'Are you sure you want to exit?', icon="warning")
+    if result == 'yes':
+        root.destroy()
+        exit()
+
+def Exit2():
+    result = tkMessageBox.askquestion('Payroll System', 'Are you sure you want to exit?', icon="warning")
+    if result == 'yes':
+        Home.destroy()
+        exit()
+
+menubar = Menu(root)
+filemenu = Menu(menubar, tearoff=0)
+filemenu.add_command(label="Admin Login", command=AdminShowLoginForm)
+filemenu.add_command(label="Exit", command=Exit)
+menubar.add_cascade(label="File", menu=filemenu)
+root.config(menu=menubar)
+
+#FRAME
+Title = Frame(root, bd=1, relief=SOLID)
+Title.pack(pady=10)
+
+#LABEL WIDGET IN OPENING SYSTEM
+lbl_display = Label(Title, text="Payroll System5", font=('arial', 45), bg = "white")
+lbl_display.pack()
+
+#panel
+Label(root, text="Position 1 : x=0, y=0", bg="#01A9DB", fg="#01A9DB", height=50).place(x=0, y=0)
+
+#logo
+my_logo_pic = PhotoImage(file = "brainwirelogo.png")
+lab = Label(root, image=my_logo_pic, bg="#81F7F3").pack()
+
+TopLoginForm = Frame(root, width=600, height=100, bd=1, relief=SOLID, bg = "#81F7F3")
+TopLoginForm.pack(side=TOP, pady=20)
+#login title
+lbl_text = Label(TopLoginForm, text="Login", font=('arial', 45), bg = "white")
+lbl_text.pack(fill=X)
+
+MidLoginForm = Frame(root, width=600, bg = "#81F7F3")
+MidLoginForm.pack(side=TOP, pady=50)
+#username label
+lbl_username = Label(MidLoginForm, text="Username:", font=('arial', 25), bd=18, bg = "#81F7F3", relief = "groove")
+lbl_username.grid(row=0)
+#password label
+lbl_password = Label(MidLoginForm, text="Password:", font=('arial', 25), bd=18, bg = "#81F7F3", relief = "groove")
+lbl_password.grid(row=1)
+#error label
+lbl_result = Label(MidLoginForm, text="", font=('arial', 18), bg = "#81F7F3", relief = "groove")
+lbl_result.grid(row=3, columnspan=2)
+#username text input
+username = Entry(MidLoginForm, textvariable=USERNAME, font=('arial', 25), width=15)
+username.grid(row=0, column=1)
+#password text input
+password = Entry(MidLoginForm, textvariable=PASSWORD, font=('arial', 25), width=15, show="*")
+password.grid(row=1, column=1)
+#login button
+btn_login = Button(MidLoginForm, text="Login", font=('arial', 18), width=30, bg="#01A9DB", command=Login)
+btn_login.grid(row=2, columnspan=2, pady=20)
+
+btn_login.bind('<Return>', Login)
+
+#INITIALIZATION
+if __name__ == '__main__':
+    root.mainloop()
