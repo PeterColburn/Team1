@@ -1,0 +1,798 @@
+from tkinter import *
+import tkinter.messagebox as tkMessageBox
+import sqlite3
+import tkinter.ttk as ttk
+import time
+import datetime
+from tkinter import messagebox
+
+#OPENING 
+root = Tk()
+root.title("UFIX LTD Payroll system")
+width = 1024
+height = 720
+screen_width = root.winfo_screenwidth()
+screen_height = root.winfo_screenheight()
+x = (screen_width/2) - (width/2)
+y = (screen_height/2) - (height/2)
+root.geometry("%dx%d+%d+%d" % (width, height, x, y))
+root.resizable(0, 0)
+root.config(bg = "#81F7F3")
+
+#VARIABLES
+USERNAME = StringVar()
+PASSWORD = StringVar()
+NAME = StringVar()
+ADDR = StringVar()
+NI = StringVar()
+SEARCH = StringVar()
+Name = StringVar()
+Address = StringVar()
+HoursWorked = StringVar()
+WagesHour = StringVar()
+Payable = StringVar()
+Taxable = StringVar()
+NetPayable = StringVar()
+GrossPayable = StringVar()
+OvertimeHours = StringVar()
+Employer = StringVar()
+NINumber = StringVar()
+TimeOfOrder = StringVar()
+DateOfOrder = StringVar()
+DateOfOrder.set(time.strftime("%d/%m/%Y"))
+global loginformOptions
+global admin_id
+global viewform
+global tree  
+
+#destroy file to opinion
+def DestroyFileToOption():
+    root.withdraw()
+    LoginForm()
+
+#button options to login
+def LoginForm():
+
+    global loginformOptions
+    loginformOptions = Toplevel()
+    loginformOptions.title("Login")
+    width = 1024
+    height = 739
+    screen_width = root.winfo_screenwidth()
+    screen_height = root.winfo_screenheight()
+    x = (screen_width/2) - (width/2)
+    y = (screen_height/2) - (height/2)
+    loginformOptions.resizable(0, 0)
+    loginformOptions.geometry("%dx%d+%d+%d" % (width, height, x, y))
+    loginformOptions.configure( bg = "#81F7F3")
+
+    #FRAME
+    Title = Frame(loginformOptions, bd=1, relief=FLAT)
+    Title.pack()
+
+    #top frame for titles
+    TopLoginFormOptions = Frame(loginformOptions, width=600, height=100, bd=1, relief=FLAT, bg = "#81F7F3")
+    TopLoginFormOptions.pack(side=TOP, pady=20)
+
+    #login title
+    lbl_text = Label(TopLoginFormOptions, text="Login", font=('arial', 45), bg = "white")
+    lbl_text.pack(fill=X)
+
+    #middle frame for buttons
+    MidLoginFormOptions = Frame(loginformOptions, width=600, bg = "#81F7F3")
+    MidLoginFormOptions.pack(side=TOP, pady=50)
+
+    #login button
+    btn_login = Button(MidLoginFormOptions, text="Associate Login", font=('arial', 18), width=30, bg="#01A9DB", command=DestroyOptionToAssocLog)
+    btn_login.grid(row=2, columnspan=2, pady=20)
+
+    #login button
+    btn_adminLogin = Button(MidLoginFormOptions, text="Admin Login", font=('arial', 18), width=30, bg="#01A9DB", command=DestroyOptionToAdminLog)
+    btn_adminLogin.grid(row=3, columnspan=2, pady=20)
+
+    #astetics=======================================================
+    #panel 
+    Label(loginformOptions, text="Position 1 : x=0, y=0", bg="#01A9DB", fg="#01A9DB", height=50).place(x=0, y=0)
+
+    #logo
+    lab = Label(TopLoginFormOptions, image=my_logo_pic, bg="#81F7F3").pack()
+
+#------------------------------------------------------------------------------
+#login option for associate
+def AssociateLogin():
+
+    global lbl_result
+    AssociateLoginform = Toplevel()
+    AssociateLoginform.title("Associate Login")
+    width = 1024
+    height = 739
+    screen_width = root.winfo_screenwidth()
+    screen_height = root.winfo_screenheight()
+    x = (screen_width/2) - (width/2)
+    y = (screen_height/2) - (height/2)
+
+    AssociateLoginform.resizable(0, 0)
+    AssociateLoginform.geometry("%dx%d+%d+%d" % (width, height, x, y))
+    AssociateLoginform.configure( bg = "#81F7F3")
+    TopLoginFormAssoc = Frame(AssociateLoginform, width=600, height=100, bd=1, relief=FLAT, bg = "#81F7F3")
+    TopLoginFormAssoc.pack(side=TOP, pady=30)
+    #login title
+    lbl_text = Label(TopLoginFormAssoc, text="Associate Login", font=('arial', 45), bg = "white")
+    lbl_text.pack(fill=X)
+
+    MidLoginFormAssoc = Frame(AssociateLoginform, width=600, bg = "#81F7F3")
+    MidLoginFormAssoc.pack(side=TOP, pady=50)
+    #username label
+    lbl_usernameAssoc = Label(MidLoginFormAssoc, text="Username:", font=('arial', 25), bd=18, bg = "#81F7F3", relief = FLAT)
+    lbl_usernameAssoc.grid(row=0)
+    #password label
+    lbl_passwordAssoc = Label(MidLoginFormAssoc, text="Password:", font=('arial', 25), bd=18, bg = "#81F7F3", relief = FLAT)
+    lbl_passwordAssoc.grid(row=1)
+    #error label
+    lbl_result = Label(MidLoginFormAssoc, text="", font=('arial', 18), bg = "#81F7F3", relief = FLAT)
+    lbl_result.grid(row=3, columnspan=2)
+    #username text input
+    username = Entry(MidLoginFormAssoc, textvariable=USERNAME, font=('arial', 25), width=15)
+    username.grid(row=0, column=1)
+    #password text input
+    password = Entry(MidLoginFormAssoc, textvariable=PASSWORD, font=('arial', 25), width=15, show="*")
+    password.grid(row=1, column=1)
+    #login button
+    btn_login = Button(MidLoginFormAssoc, text="Login", font=('arial', 18), width=30, bg="#01A9DB", command=AssocLogin)
+    btn_login.grid(row=2, columnspan=2, pady=20)
+    #back button
+    btn_back = Button(MidLoginFormAssoc, text="Back", font=('arial', 18), width=30, bg="#01A9DB", command=BackButton)
+    btn_back.grid(row=3, columnspan=2, pady=20)
+
+    #astetics=======================================================
+    #panel
+    Label(AssociateLoginform, text ="Position 1 : x=0, y=0", bg="#01A9DB", fg="#01A9DB", height=60).place(x=0,y=0)
+    #logo    
+    lab = Label(TopLoginFormAssoc, image = my_logo_pic, bg="#81F7F3", relief = FLAT).pack()
+   
+def AssocDatabase():
+    global conn, cursor
+    conn = sqlite3.connect("pythontut.db")
+    cursor = conn.cursor()
+    cursor.execute("CREATE TABLE IF NOT EXISTS `associate` (admin_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, username TEXT, password TEXT)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS `product` (product_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, product_name TEXT, product_qty TEXT, product_price TEXT)")
+    cursor.execute("SELECT * FROM `associate` WHERE `username` = 'associate' AND `password` = 'associate'")
+    if cursor.fetchone() is None:
+        cursor.execute("INSERT INTO `associate` (username, password) VALUES('associate', 'associate')")
+        conn.commit()
+
+def AssocLogin(event=None):
+
+    global admin_id
+    AssocDatabase()
+    if USERNAME.get == "" or PASSWORD.get() == "":
+        lbl_result.config(text="Please complete the required field!", fg="red")
+    else:
+        cursor.execute("SELECT * FROM `associate` WHERE `username` = ? AND `password` = ?", (USERNAME.get(), PASSWORD.get()))
+        if cursor.fetchone() is not None:
+            cursor.execute("SELECT * FROM `associate` WHERE `username` = ? AND `password` = ?", (USERNAME.get(), PASSWORD.get()))
+            data = cursor.fetchone()
+            admin_id = data[0]
+            USERNAME.set("")
+            PASSWORD.set("")
+            lbl_result.config(text="")
+            AssocMainHome()
+        else:
+            lbl_result.config(text="Invalid username or password", fg="red")
+            USERNAME.set("")
+            PASSWORD.set("")
+    cursor.close()
+    conn.close()  
+    
+def DestroyOptionToAssocLog():
+    loginformOptions.withdraw()
+    AssociateLogin()
+
+def AssocMainHome():
+
+    global Home
+    Home = Toplevel()
+    Home.title("Associate Home")
+    width = 1024
+    height = 739
+    screen_width = Home.winfo_screenwidth()
+    screen_height = Home.winfo_screenheight()
+    x = (screen_width/2) - (width/2)
+    y = (screen_height/2) - (height/2)
+    Home.geometry("%dx%d+%d+%d" % (width, height, x, y))
+    Home.resizable(0, 0)
+    Title = Frame(Home, bd=1, relief=FLAT)
+    Title.pack(pady=10)
+    lbl_display = Label(Title, text="Associate Home", font=('arial', 45), bg = "white")
+    lbl_display.pack()
+
+#astetics=======================================================
+#panel
+    Label(Home, text="Position 1 : x=0, y=0", bg="#01A9DB", fg="#01A9DB", height=60).place(x=0, y=0)   
+
+#logo
+    lab = Label(Home, image=my_logo_pic, bg="#81F7F3").pack()
+#astetics=======================================================
+
+#menu options
+    menubar = Menu(Home)
+    filemenu = Menu(menubar, tearoff=0)
+    filemenu2 = Menu(menubar, tearoff=0)
+    filemenu.add_command(label="Logout", command=Logout)
+    filemenu.add_command(label="Exit", command=Exit)
+    filemenu2.add_command(label="View Payslip", command=PayslipView)
+    filemenu2.add_command(label="Time Off Requests", command=TOReq)
+    menubar.add_cascade(label="File", menu=filemenu)
+    menubar.add_cascade(label="Options", menu=filemenu2)
+    Home.config(menu=menubar)
+    Home.config(bg="#81F7F3")
+
+#------------------------------------------------------------------------------
+#admin login
+def AdminLogin():
+    global lbl_result
+    Loginform = Toplevel()
+    Loginform.title("Admin Login")
+    width = 1024
+    height = 739
+    screen_width = root.winfo_screenwidth()
+    screen_height = root.winfo_screenheight()
+    x = (screen_width/2) - (width/2)
+    y = (screen_height/2) - (height/2)
+
+    Loginform.resizable(0, 0)
+    Loginform.geometry("%dx%d+%d+%d" % (width, height, x, y))
+    Loginform.configure( bg = "#81F7F3")
+    TopLoginFormAssoc = Frame(Loginform, width=600, height=100, bd=1, relief=FLAT, bg = "#81F7F3")
+    TopLoginFormAssoc.pack(side=TOP, pady=20)
+    #login title
+    lbl_text = Label(TopLoginFormAssoc, text="Admin Login", font=('arial', 45), bg = "white")
+    lbl_text.pack(fill=X)
+
+    MidLoginFormAssoc = Frame(Loginform, width=600, bg = "#81F7F3")
+    MidLoginFormAssoc.pack(side=TOP, pady=50)
+    #username label
+    lbl_usernameAssoc = Label(MidLoginFormAssoc, text="Username:", font=('arial', 25), bd=18, bg = "#81F7F3", relief = FLAT)
+    lbl_usernameAssoc.grid(row=0)
+    #password label
+    lbl_passwordAssoc = Label(MidLoginFormAssoc, text="Password:", font=('arial', 25), bd=18, bg = "#81F7F3", relief = FLAT)
+    lbl_passwordAssoc.grid(row=1)
+    #error label
+    lbl_result = Label(MidLoginFormAssoc, text="", font=('arial', 18), bg = "#81F7F3", relief = FLAT)
+    lbl_result.grid(row=3, columnspan=2)
+    #username text input
+    username = Entry(MidLoginFormAssoc, textvariable=USERNAME, font=('arial', 25), width=15)
+    username.grid(row=0, column=1)
+    #password text input
+    password = Entry(MidLoginFormAssoc, textvariable=PASSWORD, font=('arial', 25), width=15, show="*")
+    password.grid(row=1, column=1)
+    #login button
+    btn_login = Button(MidLoginFormAssoc, text="Login", font=('arial', 18), width=30, bg="#01A9DB", command=DBAdminLogin)
+    btn_login.grid(row=2, columnspan=2, pady=20)
+    #back button
+    btn_back = Button(MidLoginFormAssoc, text="Back", font=('arial', 18), width=30, bg="#01A9DB", command=BackButton)
+    btn_back.grid(row=3, columnspan=2, pady=20)
+
+    #astetics=======================================================
+    #panel
+    Label(Loginform, text ="Position 1 : x=0, y=0", bg="#01A9DB", fg="#01A9DB", height=60).place(x=0,y=0)
+    #logo    
+    lab = Label(TopLoginFormAssoc, image = my_logo_pic, bg="#81F7F3", relief = FLAT).pack()
+
+def AdminDatabase():
+    global conn, cursor
+    conn = sqlite3.connect("pythontut.db")
+    cursor = conn.cursor()
+    cursor.execute("CREATE TABLE IF NOT EXISTS `admin` (admin_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, username TEXT, password TEXT)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS `product` (product_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, product_name TEXT, product_qty TEXT, product_price TEXT)")
+    cursor.execute("SELECT * FROM `admin` WHERE `username` = 'admin' AND `password` = 'admin'")
+    if cursor.fetchone() is None:
+        cursor.execute("INSERT INTO `admin` (username, password) VALUES('admin', 'admin')")
+        conn.commit()
+
+def DBAdminLogin(event=None):
+
+    global admin_id
+    AdminDatabase()
+    if USERNAME.get == "" or PASSWORD.get() == "":
+        lbl_result.config(text="Please complete the required field!", fg="red")
+    else:
+        cursor.execute("SELECT * FROM `admin` WHERE `username` = ? AND `password` = ?", (USERNAME.get(), PASSWORD.get()))
+        if cursor.fetchone() is not None:
+            cursor.execute("SELECT * FROM `admin` WHERE `username` = ? AND `password` = ?", (USERNAME.get(), PASSWORD.get()))
+            data = cursor.fetchone()
+            admin_id = data[0]
+            USERNAME.set("")
+            PASSWORD.set("")
+            lbl_result.config(text="")
+            AdminMainHome()
+        else:
+            lbl_result.config(text="Invalid username or password", fg="red")
+            USERNAME.set("")
+            PASSWORD.set("")
+    cursor.close()
+    conn.close()   
+
+def DestroyOptionToAdminLog():
+    loginformOptions.withdraw()
+    AdminLogin()
+
+def AdminMainHome():
+
+    global Home
+    Home = Toplevel()
+    Home.title("Admin Home")
+    width = 1024
+    height = 739
+    screen_width = Home.winfo_screenwidth()
+    screen_height = Home.winfo_screenheight()
+    x = (screen_width/2) - (width/2)
+    y = (screen_height/2) - (height/2)
+    Home.geometry("%dx%d+%d+%d" % (width, height, x, y))
+    Home.resizable(0, 0)
+    Title = Frame(Home, bd=1, relief=FLAT)
+    Title.pack(pady=10)
+    lbl_display = Label(Title, text="Admin Home", font=('arial', 45), bg = "white")
+    lbl_display.pack()
+
+#astetics=======================================================
+#panel
+    Label(Home, text="Position 1 : x=0, y=0", bg="#01A9DB", fg="#01A9DB", height=60).place(x=0, y=0)   
+
+#logo
+    lab = Label(Home, image=my_logo_pic, bg="#81F7F3").pack()
+#astetics=======================================================
+
+#menu options
+    menubar = Menu(Home)
+    filemenu = Menu(menubar, tearoff=0)
+    filemenu2 = Menu(menubar, tearoff=0)
+    filemenu.add_command(label="Logout", command=Logout)
+    filemenu.add_command(label="Exit", command=Exit)
+    filemenu2.add_command(label="Add new", command=DestroyOptionToShowNew)
+    filemenu2.add_command(label="View", command=ShowView)
+    menubar.add_cascade(label="File", menu=filemenu)
+    menubar.add_cascade(label="Employees", menu=filemenu2)
+    Home.config(menu=menubar)
+    Home.config(bg="#81F7F3")
+#------------------------------------------------------------------------------
+
+#file menu options==================================================================================================================================================================================================
+def Search():
+    if SEARCH.get() != "":
+        tree.delete(*tree.get_children())
+        AssocDatabase()
+        cursor.execute("SELECT * FROM `product` WHERE `product_name` LIKE ?", ('%'+str(SEARCH.get())+'%',))
+        fetch = cursor.fetchall()
+        for data in fetch:
+            tree.insert('', 'end', values=(data))
+        cursor.close()
+        conn.close()
+
+def PayslipView():
+    global payslipform
+    payslipform = Toplevel()
+    payslipform.title("View Employees")
+    width = 1024
+    height = 739
+    screen_width = Home.winfo_screenwidth()
+    screen_height = Home.winfo_screenheight()
+    x = (screen_width/2) - (width/2)
+    y = (screen_height/2) - (height/2)
+    payslipform.geometry("%dx%d+%d+%d" % (width, height, x, y))
+    payslipform.resizable(0, 0)
+    payslipform.config(bg="#81F7F3")
+
+    lbl_text = Label(payslipform, text="View Payslip", font=('arial', 45), bg = "white", relief = FLAT)
+    lbl_text.pack(pady = 20)
+    
+    lblPaySlip=Label(payslipform, font=('arial',20,'bold'),textvariable=DateOfOrder).pack()
+
+    txtPaySlip= Text(payslipform, relief = FLAT, height=22, width=90,bd=16,font=('arial',12,'bold'))
+    txtPaySlip.pack(side = RIGHT)
+
+    txtPaySlip.insert(END, "\t\tPay Slip\n\n")
+    txtPaySlip.insert(END, 'Name:\t\t'+Name.get()+"\n\n")
+    txtPaySlip.insert(END, 'Address:\t\t'+Address.get()+"\n\n")
+    txtPaySlip.insert(END, 'Employer:\t\t'+Employer.get()+"\n\n")
+    txtPaySlip.insert(END, 'NI Number:\t\t'+NINumber.get()+"\n\n")
+    txtPaySlip.insert(END, 'HoursWorked:\t\t'+HoursWorked.get()+"\n\n")
+    txtPaySlip.insert(END, 'NetPayable:\t\t'+NetPayable.get()+"\n\n")
+    txtPaySlip.insert(END, 'Wages Per Hour:\t\t'+WagesHour.get()+"\n\n")
+    txtPaySlip.insert(END,'Tax Paid:\t\t'+Taxable.get()+"\n\n")
+    txtPaySlip.insert(END, 'Payable:\t\t'+ Payable.get()+"\n\n")
+
+    #astetics=======================================================
+    #panel 
+    Label(payslipform, text="Position 1 : x=0, y=0", bg="#01A9DB", fg="#01A9DB", height=50).place(x=0, y=0)
+
+def ShowView():
+    global viewform
+    viewform = Toplevel()
+    viewform.title("View Employees")
+    width = 1024
+    height = 739
+    screen_width = Home.winfo_screenwidth()
+    screen_height = Home.winfo_screenheight()
+    x = (screen_width/2) - (width/2)
+    y = (screen_height/2) - (height/2)
+    viewform.geometry("%dx%d+%d+%d" % (width, height, x, y))
+    viewform.resizable(0, 0)
+
+    global tree    
+    TopViewForm = Frame(viewform, width=600, bd=1, relief=FLAT, bg = "#81F7F3")
+    TopViewForm.pack(side=TOP, fill=X)
+    LeftViewForm = Frame(viewform, width=600, bg = "#81F7F3")
+    LeftViewForm.pack(side=LEFT, fill=Y)
+    MidViewForm = Frame(viewform, width=600, bg = "#81F7F3")
+    MidViewForm.pack(side = LEFT)
+    lbl_text = Label(TopViewForm, text="View Employees", font=('arial', 18), bg = "white", relief = FLAT)
+    lbl_text.pack()
+    
+    lab = Label(LeftViewForm, image=my_logo_pic, bg="#81F7F3").pack()
+    lbl_txtsearch = Label(LeftViewForm, text="Search", font=('arial', 15), bg = "#81F7F3")
+    lbl_txtsearch.pack(side=TOP, anchor=W)
+    search = Entry(LeftViewForm, textvariable=SEARCH, font=('arial', 15), width=10)
+    search.pack(side=TOP,  padx=10, fill=X)
+    btn_search = Button(LeftViewForm, text="Search", command=Search, bg = "#01A9DB")
+    btn_search.pack(side=TOP, padx=10, pady=10, fill=X)
+    btn_reset = Button(LeftViewForm, text="Reset", command=Reset, bg = "#01A9DB")
+    btn_reset.pack(side=TOP, padx=10, pady=10, fill=X)
+    btn_delete = Button(LeftViewForm, text="Delete", command=Delete, bg = "#01A9DB")
+    btn_delete.pack(side=TOP, padx=10, pady=10, fill=X)
+    scrollbarx = Scrollbar(MidViewForm, orient=HORIZONTAL)
+    scrollbary = Scrollbar(MidViewForm, orient=VERTICAL)
+    tree = ttk.Treeview(MidViewForm, columns=("ProductID", "Employee Name", "Address", "NI"), selectmode="extended", height=100, yscrollcommand=scrollbary.set, xscrollcommand=scrollbarx.set)
+    scrollbary.config(command=tree.yview)
+    scrollbary.pack(side=RIGHT, fill=Y)
+    scrollbarx.config(command=tree.xview)
+    scrollbarx.pack(side=BOTTOM, fill=X)
+    tree.heading('ProductID', text="ProductID",anchor=W)
+    tree.heading('Employee Name', text="Employee Name",anchor=W)
+    tree.heading('Address', text="Address",anchor=W)
+    tree.heading('NI', text="NI",anchor=W)
+    tree.column('#0', stretch=NO, minwidth=0, width=0)
+    tree.column('#1', stretch=NO, minwidth=0, width=0)
+    tree.column('#2', stretch=NO, minwidth=0, width=200)
+    tree.column('#3', stretch=NO, minwidth=0, width=120)
+    tree.column('#4', stretch=NO, minwidth=0, width=120)
+    tree.pack()
+    DisplayData()
+
+def TOReq():
+    global viewform
+    viewform = Toplevel()
+    viewform.title("Request Time Off")
+    width = 1024
+    height = 739
+    screen_width = Home.winfo_screenwidth()
+    screen_height = Home.winfo_screenheight()
+    x = (screen_width/2) - (width/2)
+    y = (screen_height/2) - (height/2)
+    viewform.geometry("%dx%d+%d+%d" % (width, height, x, y))
+    viewform.resizable(0, 0)
+    viewform.config(bg = "#81F7F3")
+
+    #panel 
+    Label(viewform, text="Position 1 : x=0, y=0", bg="#01A9DB", fg="#01A9DB", height=50).place(x=0, y=0)
+
+    global tree    
+    TopViewForm = Frame(viewform, width=600, bd=1, relief=FLAT, bg = "#81F7F3")
+    TopViewForm.pack(side=TOP, fill=X)
+
+    Tops= Frame(viewform, width= 1350, height= 50, bd=8, relief= FLAT, bg = "#81F7F3")
+    Tops.pack(side=TOP)
+    f1= Frame(viewform, width=600, height=600, bd=8, relief=FLAT, bg = "#81F7F3")
+    f1.pack()
+
+    f1a= Frame(f1, width=600, height= 200,bd=20, relief= FLAT, bg = "#81F7F3")
+    f1a.pack(side=TOP)
+    f1b= Frame(f1,width=600, height= 600, bd=20, relief= FLAT, bg = "#81F7F3")
+    f1b.pack(side=TOP)
+    lblinfo= Label(Tops, font=('arial',45), text="Request Time Off", bg ="white")
+    lblinfo.grid(row=0, column=0, pady = 20)
+
+    lblName= Label(f1a,text= "Name",relief=FLAT, bg = "#81F7F3", font=('arial',16,'bold'),bd=20).grid(row=0,column=0)
+    lblAddress= Label(f1a,text= "Date",relief=FLAT,bg = "#81F7F3",font=('arial',16,'bold'),bd=20).grid(row=1,column=0)
+    lblEmployer= Label(f1a,text= "Reason",relief=FLAT,bg = "#81F7F3",font=('arial',16,'bold'),bd=20).grid(row=2,column=0)
+
+    etxtName1= Entry(f1a, textvariable= Name,font=('arial',8,'bold'),bd=16,width=22, justify='left', relief=FLAT)
+    etxtName1.grid(row=0,column=1,pady=10)
+    etxtDate= Entry(f1a,textvariable= Address,font=('arial',8,'bold'),bd=16, width=22, justify='left', relief=FLAT)
+    etxtDate.grid(row=1,column=1,pady=10)
+    etxtReason= Entry(f1a,textvariable= Employer,font=('arial',8,'bold'),bd=16, width=22, justify='left', relief=FLAT)
+    etxtReason.grid(row=2,column=1,pady=10)
+
+    #login button
+    btn_requestTO = Button(f1a, text="Request", font=('arial', 18), width=30, bg="#01A9DB", command=RequestQ)
+    btn_requestTO.grid(row=3, columnspan=2, pady=20)
+     
+def RequestQ():
+    result = tkMessageBox.askquestion('Request', 'Send request?', icon="warning")
+    if result == 'yes':
+        viewform.destroy()
+        AssocMainHome()
+
+def ShowHome():
+    viewform = Toplevel()
+    viewform.title("View Employees")
+    width = 1024
+    height = 739
+    screen_width = Home.winfo_screenwidth()
+    screen_height = Home.winfo_screenheight()
+    x = (screen_width/2) - (width/2)
+    y = (screen_height/2) - (height/2)
+    viewform.geometry("%dx%d+%d+%d" % (width, height, x, y))
+    viewform.resizable(0, 0)
+ 
+    TopViewForm = Frame(viewform, width=600, bd=1, relief=FLAT, bg = "#81F7F3")
+    TopViewForm.pack(side=TOP, fill=X)
+    LeftViewForm = Frame(viewform, width=600, bg = "#81F7F3")
+    LeftViewForm.pack(side=LEFT, fill=Y)
+    MidViewForm = Frame(viewform, width=600, bg = "#81F7F3")
+    MidViewForm.pack(side = LEFT)
+    lbl_text = Label(TopViewForm, text="View Employees", font=('arial', 18), bg = "white", relief = FLAT)
+    lbl_text.pack()
+    #logo
+    lab = Label(LeftViewForm, image=my_logo_pic, bg="#81F7F3").pack()
+    lbl_txtsearch = Label(LeftViewForm, text="Search", font=('arial', 15), bg = "#81F7F3")
+    lbl_txtsearch.pack(side=TOP, anchor=W)
+    search = Entry(LeftViewForm, textvariable=SEARCH, font=('arial', 15), width=10)
+    search.pack(side=TOP,  padx=10, fill=X)
+    btn_search = Button(LeftViewForm, text="Search", command=Search, bg = "#01A9DB")
+    btn_search.pack(side=TOP, padx=10, pady=10, fill=X)
+    btn_reset = Button(LeftViewForm, text="Reset", command=Reset, bg = "#01A9DB")
+    btn_reset.pack(side=TOP, padx=10, pady=10, fill=X)
+    btn_delete = Button(LeftViewForm, text="Delete", command=Delete, bg = "#01A9DB")
+    btn_delete.pack(side=TOP, padx=10, pady=10, fill=X)
+    scrollbarx = Scrollbar(MidViewForm, orient=HORIZONTAL)
+    scrollbary = Scrollbar(MidViewForm, orient=VERTICAL)
+    tree = ttk.Treeview(MidViewForm, columns=("ProductID", "Employee Name", "Address", "NI"), selectmode="extended", height=100, yscrollcommand=scrollbary.set, xscrollcommand=scrollbarx.set)
+    scrollbary.config(command=tree.yview)
+    scrollbary.pack(side=RIGHT, fill=Y)
+    scrollbarx.config(command=tree.xview)
+    scrollbarx.pack(side=BOTTOM, fill=X)
+    tree.heading('ProductID', text="ProductID",anchor=W)
+    tree.heading('Employee Name', text="Employee Name",anchor=W)
+    tree.heading('Address', text="Address",anchor=W)
+    tree.heading('NI', text="NI",anchor=W)
+    tree.column('#0', stretch=NO, minwidth=0, width=0)
+    tree.column('#1', stretch=NO, minwidth=0, width=0)
+    tree.column('#2', stretch=NO, minwidth=0, width=200)
+    tree.column('#3', stretch=NO, minwidth=0, width=120)
+    tree.column('#4', stretch=NO, minwidth=0, width=120)
+    tree.pack()
+    DisplayData()
+
+def DisplayData():
+    AssocDatabase()
+    cursor.execute("SELECT * FROM `product`")
+    fetch = cursor.fetchall()
+    for data in fetch:
+        tree.insert('', 'end', values=(data))
+    cursor.close()
+    conn.close()
+
+def Logout():
+    result = tkMessageBox.askquestion('Payroll System', 'Are you sure you want to logout?', icon="warning")
+    if result == 'yes': 
+        admin_id = ""
+        root.deiconify()
+        Home.destroy() 
+
+def DestroyOptionToShowNew():
+    Home.withdraw()
+    ShowAddNew()
+
+def ShowAddNew():
+    global addnewform
+    addnewform = Toplevel()
+    addnewform.title("Add New Staff")
+    width = 1024
+    height = 739
+    #panel
+    Label(addnewform, text="Position 1 : x=0, y=0", bg="#01A9DB", fg="#01A9DB", height=60).place(x=0, y=0)
+    screen_width = Home.winfo_screenwidth()
+    screen_height = Home.winfo_screenheight()
+    x = (screen_width/2) - (width/2)
+    y = (screen_height/2) - (height/2)
+    addnewform.geometry("%dx%d+%d+%d" % (width, height, x, y))
+    addnewform.resizable(0, 0)
+    addnewform.config(bg = "#81F7F3")
+
+    Tops= Frame(addnewform, width= 1350, height= 50, bd=8, relief= FLAT, bg = "#81F7F3")
+    Tops.pack(side=TOP)
+    f1= Frame(addnewform, width=50, height=600, bd=8, relief=FLAT, bg = "#81F7F3")
+    f1.pack()
+
+    f1a= Frame(f1, width=550, height= 200,bd=20, relief= FLAT, bg = "#81F7F3")
+    f1a.pack(side=TOP)
+    f1b= Frame(f1,width=550, height= 600, bd=20, relief= FLAT, bg = "#81F7F3")
+    f1b.pack(side=TOP)
+    lblinfo= Label(Tops, font=('arial',30,'bold'), text="Add New employees", bg ="white")
+    lblinfo.grid(row=0, column=0)
+
+    lblName= Label(f1a,text= "Name",relief=FLAT, bg = "#81F7F3", font=('arial',16,'bold'),bd=20).grid(row=0,column=0)
+    lblAddress= Label(f1a,text= "Address",relief=FLAT,bg = "#81F7F3",font=('arial',16,'bold'),bd=20).grid(row=0,column=2)
+    lblEmployer= Label(f1a,text= "Employer",relief=FLAT,bg = "#81F7F3",font=('arial',16,'bold'),bd=20).grid(row=1,column=0)
+
+    lblNINumber= Label(f1a,text= "NI Number",relief=FLAT,bg = "#81F7F3",font=('arial',16,'bold'),bd=20).grid(row=1,column=2)
+
+    lblHoursWorked= Label(f1a,text= "Hours Worked",relief=FLAT,bg = "#81F7F3",font=('arial',16,'bold'),bd=20).grid(row=2,column=0)
+
+    lblHourlyRate= Label(f1a,text= "Hourly Rate",relief=FLAT,bg = "#81F7F3",font=('arial',16,'bold'),bd=20).grid(row=2,column=2)
+
+    lblTax= Label(f1a,text= "Tax",relief=FLAT,bg = "#81F7F3",font=('arial',16,'bold'),bd=20,anchor='w').grid(row=3,column=0)
+
+    lblOverTime= Label(f1a,text= "Over Time",relief=FLAT,bg = "#81F7F3",font=('arial',16,'bold'),bd=20).grid(row=3,column=2)
+
+    lblGrossPay= Label(f1a,text= "Gross Pay",relief=FLAT,bg = "#81F7F3",font=('arial',16,'bold'),bd=20).grid(row=4,column=0)
+
+    lblNetPay= Label(f1a,text= "Net Pay",relief=FLAT,bg = "#81F7F3",font=('arial',16,'bold'),bd=20).grid(row=4,column=2)
+
+    etxtName= Entry(f1a, textvariable= Name,font=('arial',8,'bold'),bd=16,width=22, justify='left', relief=FLAT)
+    etxtName.grid(row=0,column=1,pady=10)
+    etxtAddress= Entry(f1a,textvariable= Address,font=('arial',8,'bold'),bd=16, width=22, justify='left', relief=FLAT)
+    etxtAddress.grid(row=0,column=3,pady=10)
+    etxtEmployer= Entry(f1a,textvariable= Employer,font=('arial',8,'bold'),bd=16, width=22, justify='left', relief=FLAT)
+    etxtEmployer.grid(row=1,column=1,pady=10)
+    etxtHoursWorked= Entry(f1a,textvariable= HoursWorked,font=('arial',8,'bold'),bd=16, width=22, justify='left', relief=FLAT)
+    etxtHoursWorked.grid(row=2,column=1,pady=10)
+    etxtWagesPerHours= Entry(f1a,textvariable= WagesHour,font=('arial',8,'bold'),bd=16, width=22, justify='left', relief=FLAT)
+    etxtWagesPerHours.grid(row=2,column=3,pady=10)
+    etxtninoW= Entry(f1a,textvariable= NINumber,font=('arial',8,'bold'),bd=16, width=22, justify='left', relief=FLAT)
+    etxtninoW.grid(row=1,column=3,pady=10)
+    etxtGrossPay= Entry(f1a,textvariable= Payable,font=('arial',8,'bold'),bd=16, width=22, justify='left', relief=FLAT)
+    etxtGrossPay.grid(row=4,column=1,pady=10)
+    etxtNetPay= Entry(f1a,textvariable= NetPayable,font=('arial',8,'bold'),bd=16, width=22, justify='left', relief=FLAT)
+    etxtNetPay.grid(row=4,column=3,pady=10)
+    etxtTax= Entry(f1a,textvariable= Taxable,font=('arial',8,'bold'),bd=16, width=22, justify='left', relief=FLAT)
+    etxtTax.grid(row=3,column=1,pady=10)
+    etxtOverTime= Entry(f1a,textvariable= OvertimeHours,font=('arial',8,'bold'),bd=16, width=22, justify='left', relief=FLAT)
+    etxtOverTime.grid(row=3,column=3,pady=10)
+
+    #===========================================buttons widget=====================================================
+    btnSalary=Button(f1b, text='Weekly Salary',padx=16,pady=16,bd=8,fg="black", bg="#01A9DB",
+                     font=('arial',12,'bold'),width=14,height=1,command=WeeklyWages).grid(row=0,column=0)
+    btnReset=Button(f1b, text='Reset',padx=16,pady=16,bd=8,fg="black", bg="#01A9DB",
+                     font=('arial',12,'bold'),width=14,height=1,command=Reset).grid(row=0,column=1)
+    btnPayslip=Button(f1b, text='View Payslip',padx=16,pady=16,bd=8,fg="black", bg="#01A9DB",
+                     font=('arial',12,'bold'),width=14,height=1,command=EnterInfo).grid(row=1,column=0)
+    btnExit=Button(f1b, text='Exit System',padx=16,pady=16,bd=8,fg="black", bg="#01A9DB",
+                     font=('arial',12,'bold'),width=14,height=1,command= iExit).grid(row=1,column=1)
+
+def AddNew():
+    AssocDatabase()
+    cursor.execute("INSERT INTO `product` (product_name, product_qty, product_price) VALUES(?, ?, ?)", (str(NAME.get()), str(NI.get()), str(ADDR.get())))
+    conn.commit()
+    NAME.set("")
+    ADDR.set("")
+    NI.set("")
+    cursor.close()
+    conn.close()
+
+def DisplayData():
+    AssocDatabase()
+    cursor.execute("SELECT * FROM `product`")
+    fetch = cursor.fetchall()
+    for data in fetch:
+        tree.insert('', 'end', values=(data))
+    cursor.close()
+    conn.close()
+
+def Reset():
+    tree.delete(*tree.get_children())
+    DisplayData()
+    SEARCH.set("")
+
+def Delete():
+    if not tree.selection():
+       print("ERROR")
+    else:
+        result = tkMessageBox.askquestion('Payroll System', 'Are you sure you want to delete this record?', icon="warning")
+        if result == 'yes':
+            curItem = tree.focus()
+            contents =(tree.item(curItem))
+            selecteditem = contents['values']
+            tree.delete(curItem)
+            Database()
+            cursor.execute("DELETE FROM `product` WHERE `product_id` = %d" % selecteditem[0])
+            conn.commit()
+            cursor.close()
+            conn.close()
+
+def BackButton():
+
+    LoginForm()        
+
+def Exit():
+    result = tkMessageBox.askquestion('Payroll System', 'Are you sure you want to exit?', icon="warning")
+    if result == 'yes':
+        root.destroy()
+
+def iExit():
+    qExit= messagebox.askyesno("PAYROLL SYSTEM","Do You Want To Exit The Systems")
+    if qExit>0:
+        root.destroy()
+        return
+
+def Reset():
+    Name.set("")
+    Address.set("")
+    HoursWorked.set("")
+    WagesHour.set("")
+    Payable.set("")
+    Taxable.set("")
+    NetPayable.set("")
+    GrossPayable.set("")
+    OvertimeHours.set("")
+    Employer.set("")
+    NINumber.set("")
+    txtPaySlip.delete("1.0",END)
+
+def EnterInfo():
+    txtPaySlip.insert(END, "\t\tPay Slip\n\n")
+    txtPaySlip.insert(END, 'Name:\t\t'+Name.get()+"\n\n")
+    txtPaySlip.insert(END, 'Address:\t\t'+Address.get()+"\n\n")
+    txtPaySlip.insert(END, 'Employer:\t\t'+Employer.get()+"\n\n")
+    txtPaySlip.insert(END, 'NIMumber:\t\t'+NINumber.get()+"\n\n")
+    txtPaySlip.insert(END, 'HoursWorked:\t\t'+HoursWorked.get()+"\n\n")
+    txtPaySlip.insert(END, 'NetPayable:\t\t'+NetPayable.get()+"\n\n")
+    txtPaySlip.insert(END, 'Wages Per Hour:\t\t'+WagesHour.get()+"\n\n")
+    txtPaySlip.insert(END,'Tax Paid:\t\t'+Taxable.get()+"\n\n")
+    txtPaySlip.insert(END, 'Payable:\t\t'+ Payable.get()+"\n\n")
+
+def WeeklyWages():
+    HoursWorkedPerWeek= float(HoursWorked.get())
+    WagesPerHour= float(WagesHour.get())
+
+    Paydue= WagesPerHour*HoursWorkedPerWeek
+    PaymentDue= "₹",str('%.2f'%(Paydue))
+    Payable.set(PaymentDue)
+
+    tax= Paydue*0.2
+    Taxables= "₹",str('%.2f'%(tax))
+    Taxable.set(Taxables)
+
+    netpay= Paydue-tax
+    NetPays="₹",str('%.2f'%(netpay))
+    NetPayable.set(NetPays)
+
+    if HoursWorkedPerWeek>40:
+       overTimeHours= (HoursWorkedPerWeek-40)+WagesPerHour*1.5
+       Overtimehrs="₹",str('%.2f' %(overTimeHours))
+       OvertimeHours.set(Overtimehrs)
+    elif HoursWorkedPerWeek <=40:
+        overTimePay=(HoursWorkedPerWeek- 40)+WagesPerHour*1.5
+        Overtimehrs="₹",str ('%.2f' %(overTimePay))
+        OvertimeHours.set(Overtimehrs)
+    return
+
+#Root=================================================================================================================================================================================================================#
+menubar = Menu(root)
+filemenu = Menu(menubar, tearoff=0)
+menubar.add_cascade(label="Options", menu=filemenu)
+filemenu.add_command(label="Login", command=DestroyFileToOption)
+filemenu.add_command(label="Exit", command=Exit)
+root.config(menu=menubar)
+
+#FRAME
+Title = Frame(root, bd=1, relief=FLAT)
+Title.pack(pady=10)
+
+#LABEL WIDGET IN OPENING SYSTEM
+lbl_display = Label(Title, text="UFIX LTD Payroll", font=('arial', 45), bg = "white")
+lbl_display.pack()
+
+#astetics=======================================================
+#panel 
+Label(root, text="Position 1 : x=0, y=0", bg="#01A9DB", fg="#01A9DB", height=50).place(x=0, y=0)
+
+#logo
+my_logo_pic = PhotoImage(file = "brainwirelogo.png")
+lab = Label(root, image=my_logo_pic, bg="#81F7F3").pack()
+#astetics=======================================================
+
+#INITIALIZATION
+if __name__ == '__main__':
+    root.mainloop()
